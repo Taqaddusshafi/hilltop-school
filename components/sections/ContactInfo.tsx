@@ -1,67 +1,101 @@
 ﻿import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-export default function ContactInfo() {
+interface ContactData {
+  section_heading: string
+  section_description: string
+  address: string
+  phone: string
+  email: string
+  office_hours: string
+}
+
+export default async function ContactInfo() {
+  const supabase = await createServerSupabaseClient()
+  
+  let contactData: ContactData | null = null
+
+  if (supabase) {
+    const { data } = await supabase
+      .from('contact_info')
+      .select('*')
+      .eq('is_active', true)
+      .single()
+    
+    contactData = data
+  }
+
+  // Fallback data
+  const contact: ContactData = contactData || {
+    section_heading: "Get in Touch",
+    section_description: "Have questions? We're here to help. Contact us for admissions, inquiries, or visit our campus.",
+    address: "Darend, Ganderbal, Jammu & Kashmir - 191201",
+    phone: "+91 98765 43210",
+    email: "info@hilltop.edu",
+    office_hours: "Monday - Saturday: 8:00 AM - 4:00 PM"
+  }
+
   return (
-    <section className="py-16 bg-blue-50">
+    <section className="py-16 bg-green-50">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Contact Details */}
+          {/* Contact Details - Dynamic from Supabase */}
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Get in Touch
+              {contact.section_heading}
             </h2>
             <p className="text-gray-600 mb-8">
-              Have questions? We're here to help. Contact us for admissions, inquiries, or visit our campus.
+              {contact.section_description}
             </p>
 
             <div className="space-y-4">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   <MapPin className="text-white" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Address</h3>
-                  <p className="text-gray-600">Darend, Ganderbal, Jammu & Kashmir - 191201</p>
+                  <p className="text-gray-600">{contact.address}</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Phone className="text-white" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
                   <p className="text-gray-600">
-                    <a href="tel:+919876543210" className="hover:text-blue-600 transition">
-                      +91 98765 43210
+                    <a href={`tel:${contact.phone.replace(/\s/g, '')}`} className="hover:text-green-600 transition">
+                      {contact.phone}
                     </a>
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Mail className="text-white" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                   <p className="text-gray-600">
-                    <a href="mailto:info@hilltop.edu" className="hover:text-blue-600 transition">
-                      info@hilltop.edu
+                    <a href={`mailto:${contact.email}`} className="hover:text-green-600 transition">
+                      {contact.email}
                     </a>
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Clock className="text-white" size={24} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Office Hours</h3>
-                  <p className="text-gray-600">Monday - Saturday: 8:00 AM - 4:00 PM</p>
+                  <p className="text-gray-600">{contact.office_hours}</p>
                 </div>
               </div>
             </div>
@@ -73,7 +107,7 @@ export default function ContactInfo() {
             </div>
           </div>
 
-          {/* Google Maps Embed */}
+          {/* Google Maps Embed - Static */}
           <div className="rounded-lg overflow-hidden shadow-lg h-96">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3299.6237518474204!2d74.7967687!3d34.2070885!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38e1833cfd2c4f7d%3A0xeff016c6614b322e!2sHill%20Top%20Educational%20Institute%20Ganderbal!5e0!3m2!1sen!2sin!4v1763399008250!5m2!1sen!2sin"

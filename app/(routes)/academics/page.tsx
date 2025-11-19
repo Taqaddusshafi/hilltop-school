@@ -1,49 +1,89 @@
 ﻿import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BookOpen, Calendar, FileText, GraduationCap } from 'lucide-react'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export const metadata = {
   title: 'Academics',
   description: 'Explore our curriculum, subjects, and academic programs.',
 }
 
-export default function AcademicsPage() {
-  const classes = [
-    { level: "Primary", grades: "Class 1 - 5", subjects: "English, Urdu, Mathematics, Science, Social Studies, Computer" },
-    { level: "Middle", grades: "Class 6 - 8", subjects: "English, Urdu, Mathematics, Science, Social Studies, Computer, Arts" },
-    { level: "Secondary", grades: "Class 9 - 10", subjects: "English, Urdu, Mathematics, Science (Physics, Chemistry, Biology), Social Studies" },
-    { level: "Higher Secondary", grades: "Class 11 - 12", subjects: "Science Stream, Commerce Stream, Arts Stream" }
+const iconMap = {
+  BookOpen,
+  FileText,
+  Calendar,
+}
+
+export default async function AcademicsPage() {
+  const supabase = await createServerSupabaseClient()
+  
+  // Fetch all data
+  let academicsData = null
+  let classLevels: any[] = []
+  let teachingMethods: any[] = []
+  let calendarEvents: any[] = []
+
+  if (supabase) {
+    const [academics, classes, methods, calendar] = await Promise.all([
+      supabase.from('academics_page').select('*').eq('is_active', true).single(),
+      supabase.from('class_levels').select('*').eq('is_active', true).order('display_order'),
+      supabase.from('teaching_methodology').select('*').eq('is_active', true).order('display_order'),
+      supabase.from('academic_calendar').select('*').eq('is_active', true).order('display_order')
+    ])
+
+    academicsData = academics.data
+    classLevels = classes.data || []
+    teachingMethods = methods.data || []
+    calendarEvents = calendar.data || []
+  }
+
+  // Fallback data
+  const academics = academicsData || {
+    hero_title: "Academics",
+    hero_subtitle: "Comprehensive curriculum designed for holistic development",
+    curriculum_heading: "Our Curriculum",
+    curriculum_description: "We follow the state education board curriculum..."
+  }
+
+  const classes = classLevels.length > 0 ? classLevels : [
+    { id: 1, level: "Primary", grades: "Class 1 - 5", subjects: "English, Urdu, Mathematics..." }
+  ]
+
+  const methods = teachingMethods.length > 0 ? teachingMethods : [
+    { id: 1, title: "Interactive Learning", description: "Student-centered approach...", icon_name: "BookOpen" }
+  ]
+
+  const calendar = calendarEvents.length > 0 ? calendarEvents : [
+    { id: 1, event_name: "School Reopening", event_date: "1st April 2025" }
   ]
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-20">
+      {/* Hero Section - Dynamic */}
+      <section className="bg-gradient-to-r from-green-900 to-green-700 text-white py-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Academics</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
-            Comprehensive curriculum designed for holistic development
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">{academics.hero_title}</h1>
+          <p className="text-xl text-green-100 max-w-2xl">
+            {academics.hero_subtitle}
           </p>
         </div>
       </section>
 
-      {/* Curriculum Overview */}
+      {/* Curriculum Overview - Dynamic */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Curriculum</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{academics.curriculum_heading}</h2>
             <p className="text-gray-600">
-              We follow the state education board curriculum with a focus on conceptual learning, 
-              practical application, and skill development. Our teaching methodology combines 
-              traditional values with modern educational practices.
+              {academics.curriculum_description}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {classes.map((classInfo, index) => (
-              <Card key={index}>
+            {classes.map((classInfo) => (
+              <Card key={classInfo.id}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
-                    <GraduationCap className="text-blue-600" size={24} />
+                    <GraduationCap className="text-green-600" size={24} />
                     {classInfo.level}
                   </CardTitle>
                 </CardHeader>
@@ -59,55 +99,39 @@ export default function AcademicsPage() {
         </div>
       </section>
 
-      {/* Teaching Methodology */}
+      {/* Teaching Methodology - Dynamic */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Teaching Methodology</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardHeader>
-                <BookOpen className="text-blue-600 mb-2" size={32} />
-                <CardTitle>Interactive Learning</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Student-centered approach with group discussions, projects, and hands-on activities.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <FileText className="text-blue-600 mb-2" size={32} />
-                <CardTitle>Regular Assessment</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Continuous evaluation through tests, assignments, and practical examinations.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Calendar className="text-blue-600 mb-2" size={32} />
-                <CardTitle>Smart Classes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Digital boards and multimedia content for enhanced understanding.
-                </p>
-              </CardContent>
-            </Card>
+            {methods.map((method) => {
+              const IconComponent = iconMap[method.icon_name as keyof typeof iconMap] || BookOpen
+              
+              return (
+                <Card key={method.id}>
+                  <CardHeader>
+                    <IconComponent className="text-green-600 mb-2" size={32} />
+                    <CardTitle>{method.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">
+                      {method.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* Academic Calendar */}
+      {/* Academic Calendar - Dynamic */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Academic Calendar 2025-26</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              Academic Calendar {calendar[0]?.academic_year || '2025-26'}
+            </h2>
             <div className="bg-white border rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -117,30 +141,12 @@ export default function AcademicsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">School Reopening</td>
-                    <td className="px-6 py-4 text-gray-600">1st April 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">First Term Exam</td>
-                    <td className="px-6 py-4 text-gray-600">15th - 30th July 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">Summer Vacation</td>
-                    <td className="px-6 py-4 text-gray-600">1st - 15th August 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">Second Term Exam</td>
-                    <td className="px-6 py-4 text-gray-600">1st - 15th December 2025</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">Winter Vacation</td>
-                    <td className="px-6 py-4 text-gray-600">20th Dec 2025 - 5th Jan 2026</td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-gray-700">Annual Exam</td>
-                    <td className="px-6 py-4 text-gray-600">1st - 20th March 2026</td>
-                  </tr>
+                  {calendar.map((event) => (
+                    <tr key={event.id}>
+                      <td className="px-6 py-4 text-gray-700">{event.event_name}</td>
+                      <td className="px-6 py-4 text-gray-600">{event.event_date}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

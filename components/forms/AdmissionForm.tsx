@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { createClient } from '@/lib/supabase/client'
 
 export default function AdmissionForm() {
   const [formData, setFormData] = useState({
@@ -19,14 +20,33 @@ export default function AdmissionForm() {
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      const supabase = createClient()
+      
+      const { error: submitError } = await supabase
+        .from('admission_applications')
+        .insert([
+          {
+            student_name: formData.studentName,
+            parent_name: formData.parentName,
+            email: formData.email,
+            phone: formData.phone,
+            class_applying: formData.classApplying,
+            previous_school: formData.previousSchool,
+            message: formData.message,
+            status: 'pending'
+          }
+        ])
+
+      if (submitError) throw submitError
+
       setSubmitted(true)
       setFormData({
         studentName: '',
@@ -37,7 +57,12 @@ export default function AdmissionForm() {
         previousSchool: '',
         message: ''
       })
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit application. Please try again.')
+      console.error('Error submitting application:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
@@ -54,7 +79,9 @@ export default function AdmissionForm() {
             <p className="text-gray-600 mb-6">
               Thank you for applying. We will contact you within 2-3 business days.
             </p>
-            <Button onClick={() => setSubmitted(false)}>Submit Another Application</Button>
+            <Button onClick={() => setSubmitted(false)} className="bg-green-600 hover:bg-green-700">
+              Submit Another Application
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -67,6 +94,12 @@ export default function AdmissionForm() {
         <CardTitle>Admission Enquiry Form</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            {error}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="studentName">Student Name *</Label>
@@ -144,7 +177,7 @@ export default function AdmissionForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
             {loading ? 'Submitting...' : 'Submit Application'}
           </Button>
         </form>
@@ -152,4 +185,3 @@ export default function AdmissionForm() {
     </Card>
   )
 }
-

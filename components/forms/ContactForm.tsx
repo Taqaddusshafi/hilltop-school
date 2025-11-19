@@ -1,5 +1,4 @@
-﻿
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { createClient } from '@/lib/supabase/client'
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -18,14 +18,31 @@ export default function ContactForm() {
   })
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      const supabase = createClient()
+      
+      const { error: submitError } = await supabase
+        .from('contact_submissions')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            subject: formData.subject,
+            message: formData.message,
+            status: 'pending'
+          }
+        ])
+
+      if (submitError) throw submitError
+
       setSubmitted(true)
       setFormData({
         name: '',
@@ -34,7 +51,12 @@ export default function ContactForm() {
         subject: '',
         message: ''
       })
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message || 'Failed to submit message. Please try again.')
+      console.error('Error submitting contact form:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
@@ -49,9 +71,11 @@ export default function ContactForm() {
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
             <p className="text-gray-600 mb-6">
-              Thank you for contacting us. We'll get back to you soon.
+              Thank you for contacting us. We&apos;ll get back to you soon.
             </p>
-            <Button onClick={() => setSubmitted(false)}>Send Another Message</Button>
+            <Button onClick={() => setSubmitted(false)} className="bg-green-600 hover:bg-green-700">
+              Send Another Message
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -64,6 +88,12 @@ export default function ContactForm() {
         <CardTitle>Send us a Message</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            {error}
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Name *</Label>
@@ -119,7 +149,7 @@ export default function ContactForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
             {loading ? 'Sending...' : 'Send Message'}
           </Button>
         </form>
