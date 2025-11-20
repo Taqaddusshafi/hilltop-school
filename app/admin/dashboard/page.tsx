@@ -14,6 +14,7 @@ export default async function AdminDashboard() {
     { data: admissions },
     { data: circulars },
     { data: hero },
+    { data: heroImages },  // ADD THIS
     { data: navbar },
     { data: footer },
     { data: aboutPage },
@@ -30,6 +31,7 @@ export default async function AdminDashboard() {
     supabase.from('admission_applications').select('*').order('created_at', { ascending: false }),
     supabase.from('circulars').select('*').order('circular_date', { ascending: false }),
     supabase.from('hero').select('*').eq('is_active', true).single(),
+    supabase.from('hero_images').select('*').order('display_order'),  // ADD THIS
     supabase.from('navbar_info').select('*').eq('is_active', true).single(),
     supabase.from('footer_info').select('*').eq('is_active', true).single(),
     supabase.from('about_page').select('*').eq('is_active', true).single(),
@@ -55,6 +57,7 @@ export default async function AdminDashboard() {
         admissions={admissions || []}
         circulars={circulars || []}
         hero={hero}
+        heroImages={heroImages || []}  // ADD THIS
         navbar={navbar}
         footer={footer}
         aboutPage={aboutPage}

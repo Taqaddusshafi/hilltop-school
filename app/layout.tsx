@@ -1,8 +1,5 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: {
@@ -13,23 +10,15 @@ export const metadata: Metadata = {
   keywords: ["school in Ganderbal", "Hilltop Educational Institute", "Darend school", "Kashmir education"],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
-  const pathname = headersList.get('x-invoke-path') || '';
-  const isAdmin = pathname.startsWith('/admin');
-
   return (
     <html lang="en">
       <body className="antialiased">
-        {!isAdmin && <Navbar />}
-        <main className="min-h-screen">
-          {children}
-        </main>
-        {!isAdmin && <Footer />}
+        {children}
       </body>
     </html>
   );

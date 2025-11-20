@@ -25,6 +25,7 @@ interface AdminTabsProps {
   admissions: any[]
   circulars: any[]
   hero: any
+  heroImages: any[]  // ADD THIS
   navbar: any
   footer: any
   aboutPage: any
@@ -43,6 +44,7 @@ export default function AdminTabs({
   admissions, 
   circulars,
   hero,
+  heroImages,  // ADD THIS
   navbar,
   footer,
   aboutPage,
@@ -103,7 +105,7 @@ export default function AdminTabs({
         {activeTab === 'contacts' && <ContactsManager initialContacts={contacts} />}
         {activeTab === 'admissions' && <AdmissionsManager initialAdmissions={admissions} />}
         {activeTab === 'circulars' && <CircularsManager initialCirculars={circulars} />}
-        {activeTab === 'hero' && <HeroManager initialHero={hero} />}
+        {activeTab === 'hero' && <HeroManager initialHero={hero} initialImages={heroImages} />}
         {activeTab === 'stats' && <StatsManager initialStats={stats} />}
         {activeTab === 'highlights' && <HighlightsManager initialHighlights={highlights} />}
         {activeTab === 'notices' && <NoticesManager initialNotices={notices} />}
