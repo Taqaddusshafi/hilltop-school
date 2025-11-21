@@ -16,6 +16,7 @@ import StatsManager from './StatsManager'
 import HighlightsManager from './HighlightsManager'
 import NoticesManager from './NoticesManager'
 import ContactInfoManager from './ContactInfoManager'
+import StudentsPageManager from './StudentsPageManager'
 
 interface AdminTabsProps {
   news: any[]
@@ -25,7 +26,7 @@ interface AdminTabsProps {
   admissions: any[]
   circulars: any[]
   hero: any
-  heroImages: any[]  // ADD THIS
+  heroImages: any[]
   navbar: any
   footer: any
   aboutPage: any
@@ -34,6 +35,11 @@ interface AdminTabsProps {
   highlights: any[]
   notices: any[]
   contactInfo: any
+  studentsPage: any
+  studentDownloads: any[]
+  elibraryResources: any[]
+  studentAchievements: any[]
+  alumniStats: any[]
 }
 
 export default function AdminTabs({ 
@@ -44,7 +50,7 @@ export default function AdminTabs({
   admissions, 
   circulars,
   hero,
-  heroImages,  // ADD THIS
+  heroImages,
   navbar,
   footer,
   aboutPage,
@@ -52,7 +58,12 @@ export default function AdminTabs({
   stats,
   highlights,
   notices,
-  contactInfo
+  contactInfo,
+  studentsPage,
+  studentDownloads,
+  elibraryResources,
+  studentAchievements,
+  alumniStats
 }: AdminTabsProps) {
   const [activeTab, setActiveTab] = useState('news')
 
@@ -72,6 +83,7 @@ export default function AdminTabs({
     { id: 'footer', label: 'Footer' },
     { id: 'about', label: 'About Page' },
     { id: 'academics', label: 'Academics' },
+    { id: 'students', label: 'Students Page' },
   ]
 
   return (
@@ -114,6 +126,15 @@ export default function AdminTabs({
         {activeTab === 'footer' && <FooterManager initialFooter={footer} />}
         {activeTab === 'about' && <AboutPageManager initialData={aboutPage} />}
         {activeTab === 'academics' && <AcademicsPageManager initialData={academicsPage} />}
+        {activeTab === 'students' && (
+          <StudentsPageManager
+            pageData={studentsPage}
+            downloads={studentDownloads}
+            elibraryResources={elibraryResources}
+            achievements={studentAchievements}
+            alumniStats={alumniStats}
+          />
+        )}
       </div>
     </div>
   )
