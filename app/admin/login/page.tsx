@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Loader2 } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -19,10 +21,12 @@ export default function AdminLoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setLoadingMessage('Signing in...')
 
     try {
       const supabase = createClient()
       
+      // Step 1: Sign in
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -30,7 +34,9 @@ export default function AdminLoginPage() {
 
       if (signInError) throw signInError
 
-      // Check if user is admin
+      // Step 2: Verify admin status
+      setLoadingMessage('Verifying admin access...')
+      
       const { data: adminUser } = await supabase
         .from('admin_users')
         .select('id')
@@ -43,17 +49,33 @@ export default function AdminLoginPage() {
         throw new Error('Unauthorized. Admin access only.')
       }
 
+      // Step 3: Redirect
+      setLoadingMessage('Redirecting to dashboard...')
+      
       router.push('/admin/dashboard')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'Failed to login')
-    } finally {
       setLoading(false)
+      setLoadingMessage('')
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 to-green-700 p-4">
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-4 shadow-2xl">
+            <Loader2 className="w-12 h-12 animate-spin text-green-600" />
+            <p className="text-lg font-medium text-gray-900">{loadingMessage}</p>
+            <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-green-600 rounded-full animate-pulse" style={{ width: '100%' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -79,6 +101,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@hilltop.edu"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -91,6 +114,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -99,7 +123,14 @@ export default function AdminLoginPage() {
               className="w-full bg-green-600 hover:bg-green-700" 
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                'Login'
+              )}
             </Button>
           </form>
         </CardContent>
