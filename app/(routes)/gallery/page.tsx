@@ -82,6 +82,9 @@ export default function GalleryPage() {
     }
   }
 
+  // Google 360° Photosphere URL
+  const virtualTourUrl = "https://www.google.com/maps/embed?pb=!4v1732187000000!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRDRsSUdRU2c!2m2!1d34.22817847809265!2d74.77046965597594!3f97.26695!4f-9.162485!5f0.7820865974627469"
+
   return (
     <div className="min-h-screen">
       {/* Hero Section - Dynamic */}
@@ -206,7 +209,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Virtual Tour - Dynamic */}
+      {/* Virtual Tour - Dynamic with Google 360° */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -214,22 +217,18 @@ export default function GalleryPage() {
             <p className="text-gray-600 mb-8">
               {page.virtual_tour_description}
             </p>
-            {page.virtual_tour_url ? (
-              <div className="aspect-video rounded-lg overflow-hidden">
-                <iframe
-                  src={page.virtual_tour_url}
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  title="Virtual Campus Tour"
-                />
-              </div>
-            ) : (
-              <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">360° Virtual Tour (Coming Soon)</p>
-              </div>
-            )}
+            <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
+              <iframe
+                src={page.virtual_tour_url || virtualTourUrl}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Virtual Campus Tour - 360° View"
+              />
+            </div>
           </div>
         </div>
       </section>
