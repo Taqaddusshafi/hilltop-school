@@ -18,6 +18,7 @@ export default async function AdminDashboard() {
     { data: navbar },
     { data: footer },
     { data: aboutPage },
+    { data: principalMessage },  // Add this line
     { data: academicsPage },
     { data: stats },
     { data: highlights },
@@ -40,6 +41,7 @@ export default async function AdminDashboard() {
     supabase.from('navbar_info').select('*').eq('is_active', true).single(),
     supabase.from('footer_info').select('*').eq('is_active', true).single(),
     supabase.from('about_page').select('*').eq('is_active', true).single(),
+    supabase.from('principal_message').select('*').eq('is_active', true).single(),  // Add this line
     supabase.from('academics_page').select('*').eq('is_active', true).single(),
     supabase.from('stats').select('*').eq('is_active', true).order('display_order'),
     supabase.from('highlights').select('*').eq('is_active', true).order('display_order'),
@@ -71,6 +73,7 @@ export default async function AdminDashboard() {
         navbar={navbar}
         footer={footer}
         aboutPage={aboutPage}
+        principalMessage={principalMessage}  // Add this line
         academicsPage={academicsPage}
         stats={stats || []}
         highlights={highlights || []}

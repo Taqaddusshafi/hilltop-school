@@ -30,6 +30,7 @@ interface AdminTabsProps {
   navbar: any
   footer: any
   aboutPage: any
+  principalMessage: any  // Add this
   academicsPage: any
   stats: any[]
   highlights: any[]
@@ -54,6 +55,7 @@ export default function AdminTabs({
   navbar,
   footer,
   aboutPage,
+  principalMessage,  // Add this
   academicsPage,
   stats,
   highlights,
@@ -124,7 +126,12 @@ export default function AdminTabs({
         {activeTab === 'contact-info' && <ContactInfoManager initialData={contactInfo} />}
         {activeTab === 'navbar' && <NavbarManager initialNavbar={navbar} />}
         {activeTab === 'footer' && <FooterManager initialFooter={footer} />}
-        {activeTab === 'about' && <AboutPageManager initialData={aboutPage} />}
+        {activeTab === 'about' && (
+          <AboutPageManager 
+            initialData={aboutPage} 
+            principalData={principalMessage}
+          />
+        )}
         {activeTab === 'academics' && <AcademicsPageManager initialData={academicsPage} />}
         {activeTab === 'students' && (
           <StudentsPageManager
