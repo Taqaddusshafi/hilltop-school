@@ -24,13 +24,11 @@ interface HeroImage {
   is_active: boolean
 }
 
-// UPDATE THIS INTERFACE TO MATCH YOUR PROPS
 interface HeroProps {
   heroData: HeroData | null
   heroImages: HeroImage[]
 }
 
-// UPDATE THE FUNCTION PARAMETERS
 export default function Hero({ heroData, heroImages }: HeroProps) {
   const hero: HeroData = heroData || {
     title: "Welcome to Hilltop Educational Institute",
@@ -168,7 +166,7 @@ export default function Hero({ heroData, heroImages }: HeroProps) {
               size="lg" 
               variant="outline" 
               asChild 
-              className="border-2 border-white text-white hover:bg-white hover:text-green-900 shadow-xl backdrop-blur-sm"
+              className="border-2 border-white bg-white/20 text-white hover:bg-white hover:text-green-900 shadow-xl"
             >
               <Link href="/about">Learn More About Us</Link>
             </Button>
