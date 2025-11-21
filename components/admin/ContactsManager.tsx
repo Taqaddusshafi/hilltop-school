@@ -9,20 +9,51 @@ import { Mail, Phone, Trash2 } from 'lucide-react'
 
 export default function ContactsManager({ initialContacts }: { initialContacts: any[] }) {
   const router = useRouter()
-  const [contacts] = useState(initialContacts)
+  const [contacts, setContacts] = useState(initialContacts)
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this message?')) return
     
+    // Optimistic update: Remove from UI immediately
+    setContacts(prev => prev.filter(contact => contact.id !== id))
+    
     const supabase = createClient()
-    await supabase.from('contact_submissions').delete().eq('id', id)
-    router.refresh()
+    const { error } = await supabase.from('contact_submissions').delete().eq('id', id)
+    
+    if (error) {
+      console.error('Error deleting contact:', error)
+      // Rollback on error
+      setContacts(initialContacts)
+      alert('Failed to delete contact. Please try again.')
+    } else {
+      router.refresh()
+    }
   }
 
   const handleUpdateStatus = async (id: number, status: string) => {
+    // Optimistic update: Update UI immediately
+    setContacts(prev => 
+      prev.map(contact => 
+        contact.id === id 
+          ? { ...contact, status } 
+          : contact
+      )
+    )
+    
     const supabase = createClient()
-    await supabase.from('contact_submissions').update({ status }).eq('id', id)
-    router.refresh()
+    const { error } = await supabase
+      .from('contact_submissions')
+      .update({ status })
+      .eq('id', id)
+    
+    if (error) {
+      console.error('Error updating status:', error)
+      // Rollback on error
+      setContacts(initialContacts)
+      alert('Failed to update status. Please try again.')
+    } else {
+      router.refresh()
+    }
   }
 
   return (

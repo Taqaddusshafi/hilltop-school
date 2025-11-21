@@ -9,20 +9,51 @@ import { Mail, Phone, Trash2, GraduationCap } from 'lucide-react'
 
 export default function AdmissionsManager({ initialAdmissions }: { initialAdmissions: any[] }) {
   const router = useRouter()
-  const [admissions] = useState(initialAdmissions)
+  const [admissions, setAdmissions] = useState(initialAdmissions)
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this application?')) return
     
+    // Optimistic update: Remove from UI immediately
+    setAdmissions(prev => prev.filter(app => app.id !== id))
+    
     const supabase = createClient()
-    await supabase.from('admission_applications').delete().eq('id', id)
-    router.refresh()
+    const { error } = await supabase.from('admission_applications').delete().eq('id', id)
+    
+    if (error) {
+      console.error('Error deleting admission:', error)
+      // Rollback on error
+      setAdmissions(initialAdmissions)
+      alert('Failed to delete admission. Please try again.')
+    } else {
+      router.refresh()
+    }
   }
 
   const handleUpdateStatus = async (id: number, status: string) => {
+    // Optimistic update: Update UI immediately
+    setAdmissions(prev => 
+      prev.map(app => 
+        app.id === id 
+          ? { ...app, status } 
+          : app
+      )
+    )
+    
     const supabase = createClient()
-    await supabase.from('admission_applications').update({ status }).eq('id', id)
-    router.refresh()
+    const { error } = await supabase
+      .from('admission_applications')
+      .update({ status })
+      .eq('id', id)
+    
+    if (error) {
+      console.error('Error updating status:', error)
+      // Rollback on error
+      setAdmissions(initialAdmissions)
+      alert('Failed to update status. Please try again.')
+    } else {
+      router.refresh()
+    }
   }
 
   return (
