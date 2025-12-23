@@ -78,13 +78,13 @@ export default async function Footer() {
               <p className="text-green-100">Subscribe to get updates on admissions, events, and more</p>
             </div>
             <div className="w-full md:w-auto">
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="flex-1 md:w-72 px-5 py-3 rounded-xl border-2 border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:outline-none focus:border-white/50 transition-colors"
+                  className="w-full sm:w-72 px-5 py-3 rounded-xl border-2 border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 focus:outline-none focus:border-white/50 transition-colors"
                 />
-                <Button className="bg-white text-green-600 hover:bg-gray-100 shadow-xl px-6 font-bold group">
+                <Button className="w-full sm:w-auto bg-white text-green-600 hover:bg-gray-100 shadow-xl px-6 font-bold group">
                   <Send size={18} className="mr-2 group-hover:translate-x-1 transition-transform" />
                   Subscribe
                 </Button>
