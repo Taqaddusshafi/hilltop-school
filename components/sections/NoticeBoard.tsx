@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { Bell } from 'lucide-react'
+import { Bell, Megaphone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -34,7 +34,6 @@ export default function NoticeBoard() {
         }
       } catch (error) {
         console.error('Error fetching notices:', error)
-        // Keep fallback data
       }
     }
 
@@ -63,21 +62,58 @@ export default function NoticeBoard() {
   }, [])
 
   return (
-    <div className="bg-red-600 text-white py-3 overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center gap-4">
-          <Bell size={20} className="flex-shrink-0 animate-pulse" />
-          <div className="flex-1 overflow-hidden">
-            <div className="flex animate-marquee whitespace-nowrap">
-              {notices.concat(notices).map((notice, index) => (
-                <span key={`${notice.id}-${index}`} className="mx-8 text-sm md:text-base">
-                  • {notice.message}
-                </span>
-              ))}
+    <div className="relative overflow-hidden">
+      {/* Premium Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-red-600 via-rose-500 to-red-600"></div>
+      
+      {/* Animated Shimmer Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+      
+      {/* Decorative Elements */}
+      <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-red-700 to-transparent"></div>
+      <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-red-700 to-transparent"></div>
+      
+      {/* Content Container */}
+      <div className="relative py-4">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-4">
+            {/* Icon with Glow */}
+            <div className="relative flex-shrink-0">
+              <div className="absolute inset-0 bg-white/30 rounded-full blur-md animate-pulse-glow"></div>
+              <div className="relative bg-white/20 backdrop-blur-sm rounded-full p-2.5 border border-white/30">
+                <Megaphone size={22} className="text-white animate-pulse" />
+              </div>
+            </div>
+            
+            {/* Label Badge */}
+            <div className="hidden sm:flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-1.5 border border-white/30">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+              <span className="text-white font-semibold text-sm uppercase tracking-wide">Live Updates</span>
+            </div>
+            
+            {/* Marquee Container */}
+            <div className="flex-1 overflow-hidden mask-gradient">
+              <div className="flex animate-marquee whitespace-nowrap">
+                {notices.concat(notices).map((notice, index) => (
+                  <span 
+                    key={`${notice.id}-${index}`} 
+                    className="mx-8 text-sm md:text-base font-medium text-white flex items-center gap-2"
+                  >
+                    <span className="w-1.5 h-1.5 bg-yellow-300 rounded-full shadow-lg shadow-yellow-300/50"></span>
+                    {notice.message}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Bottom Glow Line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
     </div>
   )
 }

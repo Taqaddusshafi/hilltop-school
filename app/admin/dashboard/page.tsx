@@ -18,7 +18,7 @@ export default async function AdminDashboard() {
     { data: navbar },
     { data: footer },
     { data: aboutPage },
-    { data: principalMessage },  // Add this line
+    { data: principalMessage },
     { data: academicsPage },
     { data: stats },
     { data: highlights },
@@ -29,6 +29,12 @@ export default async function AdminDashboard() {
     { data: elibraryResources },
     { data: studentAchievements },
     { data: alumniStats },
+    // New data fetches
+    { data: programs },
+    { data: testimonials },
+    { data: ctaBanner },
+    { data: clubs },
+    { data: annualEvents },
   ] = await Promise.all([
     supabase.from('news_items').select('*').order('news_date', { ascending: false }),
     supabase.from('faculty_members').select('*').order('display_order'),
@@ -41,7 +47,7 @@ export default async function AdminDashboard() {
     supabase.from('navbar_info').select('*').eq('is_active', true).single(),
     supabase.from('footer_info').select('*').eq('is_active', true).single(),
     supabase.from('about_page').select('*').eq('is_active', true).single(),
-    supabase.from('principal_message').select('*').eq('is_active', true).single(),  // Add this line
+    supabase.from('principal_message').select('*').eq('is_active', true).single(),
     supabase.from('academics_page').select('*').eq('is_active', true).single(),
     supabase.from('stats').select('*').eq('is_active', true).order('display_order'),
     supabase.from('highlights').select('*').eq('is_active', true).order('display_order'),
@@ -52,6 +58,12 @@ export default async function AdminDashboard() {
     supabase.from('elibrary_resources').select('*').eq('is_active', true).order('display_order'),
     supabase.from('student_achievements').select('*').eq('is_active', true).order('display_order'),
     supabase.from('alumni_stats').select('*').eq('is_active', true).order('display_order'),
+    // New data fetches
+    supabase.from('programs').select('*').eq('is_active', true).order('display_order'),
+    supabase.from('testimonials').select('*').eq('is_active', true).order('display_order'),
+    supabase.from('cta_banner').select('*').eq('is_active', true).single(),
+    supabase.from('clubs').select('*').eq('is_active', true).order('display_order'),
+    supabase.from('annual_events').select('*').eq('is_active', true).order('display_order'),
   ])
 
   return (
@@ -73,7 +85,7 @@ export default async function AdminDashboard() {
         navbar={navbar}
         footer={footer}
         aboutPage={aboutPage}
-        principalMessage={principalMessage}  // Add this line
+        principalMessage={principalMessage}
         academicsPage={academicsPage}
         stats={stats || []}
         highlights={highlights || []}
@@ -84,6 +96,12 @@ export default async function AdminDashboard() {
         elibraryResources={elibraryResources || []}
         studentAchievements={studentAchievements || []}
         alumniStats={alumniStats || []}
+        // New props
+        programs={programs || []}
+        testimonials={testimonials || []}
+        ctaBanner={ctaBanner}
+        clubs={clubs || []}
+        annualEvents={annualEvents || []}
       />
     </div>
   )
